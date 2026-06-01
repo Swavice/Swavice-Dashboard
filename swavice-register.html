@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Swavice — Register Your Organisation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080E1C;--surface:#0C1526;--elevated:#111E33;
+  --orange:#D4AF37;--orange-glow:rgba(212,175,55,0.22);--orange-dim:rgba(212,175,55,0.10);
+  --blue:#3D7EFF;--blue-glow:rgba(61,126,255,0.20);
+  --green:#10B981;--red:#EF4444;
+  --t1:#EFF2F9;--t2:#94A3C0;--t3:#566078;
+  --glass1:rgba(255,255,255,0.04);--glass-bd:rgba(255,255,255,0.09);--glass-bdhi:rgba(255,255,255,0.16);
+  --r-md:12px;--r-lg:16px;--r-xl:22px;
+  --font:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+}
+html,body{min-height:100vh;font-family:var(--font);background:var(--bg);color:var(--t1);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 700px 500px at 15% 10%,rgba(61,126,255,0.10) 0%,transparent 70%),radial-gradient(ellipse 500px 400px at 85% 5%,rgba(212,175,55,0.08) 0%,transparent 65%),radial-gradient(ellipse 600px 400px at 5% 90%,rgba(167,139,250,0.07) 0%,transparent 65%),radial-gradient(ellipse 480px 380px at 92% 88%,rgba(61,126,255,0.08) 0%,transparent 60%);pointer-events:none;z-index:0}
+.page{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:20px 32px;border-bottom:1px solid var(--glass-bd);background:rgba(8,14,28,0.85);backdrop-filter:blur(20px);position:sticky;top:0;z-index:10}
+.nav-logo{font-size:22px;font-weight:900;color:var(--t1);letter-spacing:-0.5px}
+.nav-logo span{color:var(--orange);text-shadow:0 0 16px var(--orange-glow)}
+.nav-links{display:flex;gap:20px;align-items:center}
+.nav-link{font-size:13px;color:var(--t2);font-weight:500;cursor:pointer;text-decoration:none;transition:color .15s}
+.nav-link:hover{color:var(--t1)}
+.nav-cta{background:var(--orange);color:#080E1C;padding:8px 18px;border-radius:var(--r-md);font-size:13px;font-weight:700;cursor:pointer;border:none;text-decoration:none;transition:all .15s}
+.nav-cta:hover{box-shadow:0 0 20px var(--orange-glow)}
+
+/* HERO */
+.hero{padding:48px 24px 40px;max-width:1180px;margin:0 auto;width:100%}
+.hero-inner{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,400px);align-items:center;gap:48px}
+.hero-copy{text-align:left;display:flex;flex-direction:column;align-items:flex-start;gap:20px}
+.hero h1{font-size:clamp(28px,4.5vw,50px);font-weight:900;color:var(--t1);letter-spacing:-1.5px;line-height:1.1;margin:0}
+.hero h1 span{color:var(--orange)}
+.hero p{font-size:16px;color:var(--t2);line-height:1.7;max-width:540px;margin:0}
+.hero-btns{display:flex;gap:12px;justify-content:flex-start;flex-wrap:wrap;margin:0}
+.btn-hero{padding:12px 24px;border-radius:var(--r-lg);font-size:14px;font-weight:700;cursor:pointer;border:none;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all .2s}
+.btn-hero-primary{background:var(--orange);color:#080E1C;box-shadow:0 0 28px var(--orange-glow)}
+.btn-hero-primary:hover{box-shadow:0 0 40px var(--orange-glow),0 4px 14px rgba(212,175,55,0.4);transform:translateY(-2px)}
+.btn-hero-ghost{background:var(--glass1);color:var(--t1);border:1px solid var(--glass-bd)}
+.btn-hero-ghost:hover{background:rgba(255,255,255,0.07);border-color:var(--glass-bdhi)}
+.hero-store-btns{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0}
+.hero .store-btn{min-width:148px;padding:9px 14px;border-radius:12px}
+.hero .store-icon{font-size:21px}
+.hero .store-name{font-size:14px}
+.hero-visual{position:relative;display:flex;align-items:center;justify-content:center;min-height:420px}
+.hero-visual::before{content:'';position:absolute;width:76%;height:72%;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,0.18),rgba(61,126,255,0.10) 42%,transparent 72%);filter:blur(18px);opacity:.95}
+.phone-mockup{position:relative;width:min(100%,360px);max-height:520px;object-fit:contain;filter:drop-shadow(0 24px 48px rgba(0,0,0,0.55)) drop-shadow(0 0 32px rgba(212,175,55,0.10))}
+
+/* SECTION DIVIDER */
+.section-divider{height:1px;background:linear-gradient(90deg,transparent,var(--glass-bd) 20%,var(--glass-bd) 80%,transparent);margin:0 32px}
+
+/* HOW IT WORKS */
+.section{padding:72px 24px;max-width:1100px;margin:0 auto;width:100%}
+.section-label{font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;text-align:center}
+.section-title{font-size:clamp(24px,3vw,36px);font-weight:800;color:var(--t1);letter-spacing:-0.8px;text-align:center;margin-bottom:8px}
+.section-sub{font-size:15px;color:var(--t2);text-align:center;max-width:500px;margin:0 auto 48px}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+.step-card{background:var(--glass1);border:1px solid var(--glass-bd);border-radius:var(--r-xl);padding:24px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s}
+.step-card:hover{border-color:var(--glass-bdhi);transform:translateY(-4px)}
+.step-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.10),transparent)}
+.step-num{width:36px;height:36px;border-radius:50%;background:var(--orange-dim);border:1px solid rgba(212,175,55,0.3);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--orange);margin-bottom:14px}
+.step-icon{font-size:24px;margin-bottom:10px}
+.step-title{font-size:15px;font-weight:700;color:var(--t1);margin-bottom:6px}
+.step-desc{font-size:13px;color:var(--t2);line-height:1.6}
+
+/* PLANS */
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.plan-card{background:var(--glass1);border:1px solid var(--glass-bd);border-radius:var(--r-xl);padding:24px;position:relative;overflow:hidden}
+.plan-card.featured{border-color:rgba(212,175,55,0.4);box-shadow:0 0 40px rgba(212,175,55,0.10)}
+.plan-badge{position:absolute;top:14px;right:14px;background:var(--orange);color:#080E1C;font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px}
+.plan-name{font-size:13px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px}
+.plan-price{font-size:36px;font-weight:900;color:var(--t1);letter-spacing:-1.5px;line-height:1}
+.plan-price span{font-size:14px;font-weight:400;color:var(--t3)}
+.plan-techs{font-size:12px;color:var(--orange);font-weight:600;margin:8px 0 16px}
+.plan-features{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.plan-features li{font-size:13px;color:var(--t2);display:flex;align-items:center;gap:8px}
+.plan-features li::before{content:'✓';color:var(--green);font-weight:700;font-size:12px;flex-shrink:0}
+.plan-btn{width:100%;padding:11px;border-radius:var(--r-md);font-size:13px;font-weight:700;cursor:pointer;border:none;text-align:center;transition:all .15s}
+.plan-btn-primary{background:var(--orange);color:#080E1C}
+.plan-btn-ghost{background:var(--glass1);color:var(--t1);border:1px solid var(--glass-bd)}
+.plan-btn:hover{filter:brightness(1.1)}
+
+/* REGISTRATION FORM */
+.reg-wrap{padding:72px 24px;max-width:580px;margin:0 auto;width:100%}
+.reg-card{background:var(--glass1);border:1px solid var(--glass-bdhi);border-radius:var(--r-xl);padding:36px;position:relative;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5),0 0 80px rgba(212,175,55,0.04)}
+.reg-card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(212,175,55,0.4),transparent)}
+.reg-title{font-size:22px;font-weight:800;color:var(--t1);margin-bottom:4px;letter-spacing:-0.4px}
+.reg-sub{font-size:13px;color:var(--t3);margin-bottom:28px}
+.field-group{margin-bottom:14px}
+.field-sep{height:1px;background:var(--glass-bd);margin:20px 0;position:relative}
+.field-sep-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg);padding:0 12px;font-size:11px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:0.8px}
+label{display:block;font-size:12px;font-weight:500;color:var(--t2);margin-bottom:5px}
+label span{color:var(--orange)}
+input,select{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--glass-bd);border-radius:var(--r-md);padding:11px 13px;font-size:14px;color:var(--t1);outline:none;transition:border-color .15s,background .15s;font-family:var(--font)}
+.password-field{position:relative}
+.password-field input{padding-right:48px}
+.password-toggle{position:absolute;top:50%;right:10px;transform:translateY(-50%);width:32px;height:32px;border:none;background:none;color:var(--t2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:10px}
+.password-toggle:hover{background:rgba(255,255,255,0.06);color:var(--t1)}
+.password-toggle:focus-visible{outline:2px solid rgba(212,175,55,0.45);outline-offset:2px}
+input::placeholder{color:var(--t3)}
+input:focus,select:focus{border-color:rgba(212,175,55,0.5);background:rgba(255,255,255,0.06);box-shadow:0 0 0 3px rgba(212,175,55,0.08)}
+select option{background:#0C1526;color:var(--t1)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.reg-btn{width:100%;padding:14px;border-radius:var(--r-md);font-size:15px;font-weight:800;cursor:pointer;border:none;background:var(--orange);color:#080E1C;margin-top:8px;transition:all .2s;letter-spacing:-0.2px}
+.reg-btn:hover:not(:disabled){box-shadow:0 0 28px var(--orange-glow),0 4px 14px rgba(212,175,55,0.4);transform:translateY(-1px)}
+.reg-btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.error-box{background:rgba(239,68,68,0.10);border:1px solid rgba(239,68,68,0.25);border-radius:var(--r-md);padding:11px 14px;font-size:13px;color:#EF4444;margin-bottom:14px;display:none}
+.success-box{background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.25);border-radius:var(--r-xl);padding:28px 24px;text-align:center;display:none}
+.success-icon{font-size:48px;margin-bottom:14px}
+.success-title{font-size:20px;font-weight:800;color:var(--t1);margin-bottom:8px}
+.success-sub{font-size:14px;color:var(--t2);line-height:1.7}
+.signin-link{text-align:center;font-size:13px;color:var(--t3);margin-top:18px}
+.signin-link a{color:var(--orange);font-weight:600;text-decoration:none}
+
+/* DOWNLOAD */
+.download-section{padding:72px 24px;text-align:center;position:relative;overflow:hidden;width:100%}
+.download-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 800px 400px at 50% 50%,rgba(212,175,55,0.07) 0%,transparent 70%);pointer-events:none}
+.download-inner{max-width:720px;margin:0 auto;position:relative}
+.download-phones{display:flex;justify-content:center;gap:10px;margin-bottom:40px}
+.download-phone{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;background:var(--glass1);border:1px solid var(--glass-bdhi)}
+.download-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.store-btn{display:inline-flex;align-items:center;gap:12px;background:var(--elevated);border:1px solid var(--glass-bdhi);border-radius:14px;padding:12px 22px;text-decoration:none;color:var(--t1);transition:all .2s;min-width:170px}
+.store-btn:hover{border-color:rgba(212,175,55,0.5);box-shadow:0 0 24px rgba(212,175,55,0.12);transform:translateY(-2px)}
+.store-icon{font-size:28px;flex-shrink:0}
+.store-text{text-align:left;display:flex;flex-direction:column;gap:2px}
+.store-sub{display:block;font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:0.6px}
+.store-name{display:block;font-size:16px;font-weight:800;color:var(--t1);letter-spacing:-0.3px;line-height:1.2}
+.store-note{font-size:12px;color:var(--t3);margin-top:16px}
+
+/* FOOTER */
+footer{border-top:1px solid var(--glass-bd);padding:28px 32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:auto}
+.footer-logo{font-size:16px;font-weight:800;color:var(--t1)}
+.footer-logo span{color:var(--orange)}
+.footer-text{font-size:12px;color:var(--t3)}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .form-row{grid-template-columns:1fr}
+  nav{padding:16px 20px}
+  .nav-links{gap:10px}
+  .nav-link{display:none}
+  .nav-cta{white-space:nowrap;padding:8px 14px}
+  .hero{padding:36px 20px 28px}
+  .hero-inner{grid-template-columns:1fr;gap:32px}
+  .hero-copy{text-align:center;align-items:center}
+  .hero p{max-width:100%}
+  .hero-btns,.hero-store-btns{justify-content:center}
+  .hero-visual{min-height:auto}
+  .phone-mockup{width:min(84vw,330px);max-height:500px}
+  .reg-card{padding:24px 20px}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">Swa<span>vice</span></div>
+    <div class="nav-links">
+      <a href="#how" class="nav-link">How it works</a>
+      <a href="#plans" class="nav-link">Plans</a>
+      <a href="#download" class="nav-link">Download</a>
+      <a href="swavice-admin-dashboard.html" class="nav-link">Sign In</a>
+      <a href="#register" class="nav-cta">Get Started Free</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <h1>Field service reports<br><span>your whole team</span> will love</h1>
+        <p>Swavice gives your technicians a powerful mobile app for structured reports, GPS tracking, and digital signatures — while giving supervisors real-time visibility from the web dashboard.</p>
+        <div class="hero-btns">
+          <a href="#register" class="btn-hero btn-hero-primary">Start Free — No Credit Card</a>
+          <a href="swavice-admin-dashboard.html" class="btn-hero btn-hero-ghost">Sign In →</a>
+        </div>
+        <div class="hero-store-btns" aria-label="Download Swavice mobile app">
+          <a href="#" class="store-btn">
+            <span class="store-icon">🍎</span>
+            <span class="store-text">
+              <span class="store-sub">Download on the</span>
+              <span class="store-name">App Store</span>
+            </span>
+          </a>
+          <a href="#" class="store-btn">
+            <span class="store-icon">▶</span>
+            <span class="store-text">
+              <span class="store-sub">Get it on</span>
+              <span class="store-name">Google Play</span>
+            </span>
+          </a>
+        </div>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <img src="assets/swavice-iphone-mockup.png" alt="" class="phone-mockup">
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- HOW IT WORKS -->
+  <div class="section" id="how">
+    <div class="section-label">Simple setup</div>
+    <h2 class="section-title">Up and running in minutes</h2>
+    <p class="section-sub">No IT department required. Just register, add your team, and start reporting.</p>
+    <div class="steps">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <div class="step-icon">🏢</div>
+        <div class="step-title">Register your organisation</div>
+        <div class="step-desc">Sign up with your company name and email. Your account is ready instantly — no waiting.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <div class="step-icon">👷</div>
+        <div class="step-title">Add your technicians</div>
+        <div class="step-desc">From the web dashboard, add team members. Each gets their own login credentials.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <div class="step-icon">📱</div>
+        <div class="step-title">Technicians install Swavice</div>
+        <div class="step-desc">Technicians download the Swavice mobile app and log in with the credentials you shared.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <div class="step-icon">📊</div>
+        <div class="step-title">Reports flow automatically</div>
+        <div class="step-desc">Every report, photo, and signature syncs to your dashboard in real time. Export to PDF anytime.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- PLANS -->
+  <div class="section" id="plans">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-title">Plans that grow with you</h2>
+    <p class="section-sub">Start free. Upgrade when you need more team members.</p>
+    <div class="plans">
+      <div class="plan-card">
+        <div class="plan-name">Free</div>
+        <div class="plan-price">$0 <span>/ month</span></div>
+        <div class="plan-techs">Up to 5 team members</div>
+        <ul class="plan-features">
+          <li>Unlimited reports</li>
+          <li>Photo attachments</li>
+          <li>GPS location tracking</li>
+          <li>PDF export</li>
+          <li>Web dashboard</li>
+        </ul>
+        <button class="plan-btn plan-btn-ghost" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'})">Get Started Free</button>
+      </div>
+      <div class="plan-card featured">
+        <div class="plan-badge">Popular</div>
+        <div class="plan-name">Starter</div>
+        <div class="plan-price">$29 <span>/ month</span></div>
+        <div class="plan-techs">Up to 20 team members</div>
+        <ul class="plan-features">
+          <li>Everything in Free</li>
+          <li>Digital signatures</li>
+          <li>Push notifications</li>
+          <li>Job assignment</li>
+          <li>Audit logs</li>
+          <li>Priority support</li>
+        </ul>
+        <button class="plan-btn plan-btn-primary" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'})">Start Free Trial</button>
+      </div>
+      <div class="plan-card">
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">$79 <span>/ month</span></div>
+        <div class="plan-techs">Up to 100 team members</div>
+        <ul class="plan-features">
+          <li>Everything in Starter</li>
+          <li>Custom report templates</li>
+          <li>Client portal access</li>
+          <li>API access</li>
+          <li>Advanced analytics</li>
+          <li>Dedicated support</li>
+        </ul>
+        <button class="plan-btn plan-btn-ghost" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'})">Contact Sales</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- DOWNLOAD APP -->
+  <div class="download-section" id="download">
+    <div class="download-inner">
+      <div class="download-phones">
+        <div class="download-phone">📱</div>
+        <div class="download-phone">⚙️</div>
+        <div class="download-phone">📋</div>
+      </div>
+      <div class="section-label">Mobile App</div>
+      <h2 class="section-title">Take Swavice into the field</h2>
+      <p class="section-sub">Your technicians submit reports, capture photos, record GPS location, and collect digital signatures — all from their phone.</p>
+      <div class="download-btns">
+        <a href="#" class="store-btn">
+          <span class="store-icon">🍎</span>
+          <span class="store-text">
+            <span class="store-sub">Download on the</span>
+            <span class="store-name">App Store</span>
+          </span>
+        </a>
+        <a href="#" class="store-btn">
+          <span class="store-icon">▶</span>
+          <span class="store-text">
+            <span class="store-sub">Get it on</span>
+            <span class="store-name">Google Play</span>
+          </span>
+        </a>
+      </div>
+      <p class="store-note">Free download · iOS 14+ and Android 8+ supported</p>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- REGISTRATION FORM -->
+  <div class="reg-wrap" id="register">
+    <div class="reg-card">
+      <div class="reg-title">Create your organisation</div>
+      <div class="reg-sub">Free forever for up to 5 team members. No credit card required.</div>
+
+      <div id="error-box" class="error-box"></div>
+
+      <div id="success-box" class="success-box">
+        <div class="success-icon">🎉</div>
+        <div class="success-title">Organisation created!</div>
+        <div class="success-sub" id="success-text">Your account is ready. Sign in to your web dashboard and start adding your team.</div>
+        <a href="swavice-admin-dashboard.html" style="display:inline-block;margin-top:20px;background:var(--orange);color:#080E1C;padding:12px 24px;border-radius:var(--r-md);font-weight:700;text-decoration:none;font-size:14px">Open Dashboard →</a>
+      </div>
+
+      <form id="reg-form" onsubmit="handleRegister(event)">
+
+        <!-- Organisation details -->
+        <div class="field-group">
+          <label>Organisation / Company Name <span>*</span></label>
+          <input type="text" id="org_name" placeholder="e.g. Acme Field Services" required />
+        </div>
+        <div class="form-row">
+          <div class="field-group">
+            <label>Organisation Email <span>*</span></label>
+            <input type="email" id="org_email" placeholder="info@acme.co.ke" required />
+          </div>
+          <div class="field-group">
+            <label>Country</label>
+            <select id="country">
+              <option value="KE" selected>🇰🇪 Kenya</option>
+              <option value="TZ">🇹🇿 Tanzania</option>
+              <option value="UG">🇺🇬 Uganda</option>
+              <option value="NG">🇳🇬 Nigeria</option>
+              <option value="GH">🇬🇭 Ghana</option>
+              <option value="ZA">🇿🇦 South Africa</option>
+              <option value="GB">🇬🇧 United Kingdom</option>
+              <option value="US">🇺🇸 United States</option>
+              <option value="OTHER">🌍 Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-sep"><div class="field-sep-label">Admin Account</div></div>
+
+        <!-- Admin details -->
+        <div class="field-group">
+          <label>Your Full Name <span>*</span></label>
+          <input type="text" id="admin_name" placeholder="Your full name" required />
+        </div>
+        <div class="field-group">
+          <label>Your Work Email <span>*</span></label>
+          <input type="email" id="admin_email" placeholder="you@acme.co.ke" required />
+        </div>
+        <div class="form-row">
+          <div class="field-group">
+            <label>Password <span>*</span></label>
+            <div class="password-field">
+              <input type="password" id="admin_password" placeholder="Min 8 characters" minlength="8" required />
+              <button type="button" class="password-toggle" data-toggle-password="admin_password" aria-label="Show password" aria-pressed="false">👁</button>
+            </div>
+          </div>
+          <div class="field-group">
+            <label>Confirm Password <span>*</span></label>
+            <div class="password-field">
+              <input type="password" id="admin_password2" placeholder="Repeat password" required />
+              <button type="button" class="password-toggle" data-toggle-password="admin_password2" aria-label="Show password" aria-pressed="false">👁</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size:12px;color:var(--t3);margin-bottom:16px;line-height:1.6">
+          By registering you agree to Swavice's Terms of Service and Privacy Policy. Your data is stored securely in the EU (Ireland) and governed by the Kenya Data Protection Act, 2019.
+        </div>
+
+        <button type="submit" class="reg-btn" id="reg-btn">Create Organisation →</button>
+      </form>
+
+      <div class="signin-link">Already have an account? <a href="swavice-admin-dashboard.html">Sign in here</a></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Swa<span>vice</span></div>
+    <div class="footer-text">© 2026 Swavice. Built for field service teams.</div>
+    <div class="footer-text">Kenya Data Protection Act 2019 compliant · Data stored in EU (Ireland)</div>
+  </footer>
+
+</div>
+
+<script>
+const SUPA_URL  = 'https://wkauguppaqpxtifdkykb.supabase.co';
+const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrYXVndXBwYXFweHRpZmRreWtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MDA1NDIsImV4cCI6MjA5MDM3NjU0Mn0.DtAB-6hfglHpGZrP97FsEUzE_ZiTY4E6-bo7w7hk2sI';
+const DUPLICATE_PROFILE_ERROR = 'duplicate key value violates unique constraint "profiles_pkey"';
+
+async function handleRegister(e) {
+  e.preventDefault();
+  const errBox  = document.getElementById('error-box');
+  const btn     = document.getElementById('reg-btn');
+  const form    = document.getElementById('reg-form');
+  const success = document.getElementById('success-box');
+
+  errBox.style.display = 'none';
+
+  const org_name       = document.getElementById('org_name').value.trim();
+  const org_email      = document.getElementById('org_email').value.trim();
+  const admin_name     = document.getElementById('admin_name').value.trim();
+  const admin_email    = document.getElementById('admin_email').value.trim();
+  const admin_password = document.getElementById('admin_password').value;
+  const admin_password2= document.getElementById('admin_password2').value;
+  const country        = document.getElementById('country').value;
+
+  if (admin_password !== admin_password2) {
+    showError('Passwords do not match.');
+    return;
+  }
+  if (admin_password.length < 8) {
+    showError('Password must be at least 8 characters.');
+    return;
+  }
+
+  btn.textContent = 'Creating organisation…';
+  btn.disabled    = true;
+
+  try {
+    const res = await fetch(`${SUPA_URL}/functions/v1/register-organisation`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_ANON },
+      body:    JSON.stringify({ org_name, org_email, admin_name, admin_email, admin_password, country }),
+    });
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      if (isDuplicateProfileError(data.error)) {
+        const recovered = await recoverExistingAdmin(admin_email, admin_password);
+        if (recovered) return;
+      }
+      showError(mapRegisterError(data.error));
+      return;
+    }
+
+    // Success!
+    form.style.display    = 'none';
+    success.style.display = 'block';
+    document.getElementById('success-text').textContent =
+      `${data.organisation.name} is ready. Sign in with ${admin_email} to open your dashboard and start adding your team.`;
+
+  } catch (err) {
+    showError(mapRegisterError(err.message));
+  } finally {
+    btn.textContent = 'Create Organisation →';
+    btn.disabled    = false;
+  }
+}
+
+function isDuplicateProfileError(message) {
+  return String(message || '').toLowerCase().includes(DUPLICATE_PROFILE_ERROR.toLowerCase());
+}
+
+function mapRegisterError(message) {
+  const text = String(message || '').toLowerCase();
+  if (!text) return 'We could not create your organisation right now. Please try again.';
+  if (text.includes('duplicate key') || text.includes('already exists')) return 'This account already exists. Try signing in instead.';
+  if (text.includes('invalid login credentials')) return 'That email or password is not valid. Check the details and try again.';
+  if (text.includes('password')) return 'Please use a password with at least 8 characters.';
+  if (text.includes('email')) return 'Please enter a valid work email address.';
+  if (text.includes('network') || text.includes('fetch')) return 'Connection problem. Check your internet and try again.';
+  return 'We could not create your organisation right now. Please review your details and try again.';
+}
+
+async function recoverExistingAdmin(email, password) {
+  const form = document.getElementById('reg-form');
+  const success = document.getElementById('success-box');
+
+  try {
+    const res = await fetch(`${SUPA_URL}/auth/v1/token?grant_type=password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPA_ANON,
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.access_token) {
+      showError('This admin account already exists. Try signing in instead.');
+      return false;
+    }
+
+    localStorage.setItem('swavice_admin_token', data.access_token);
+    form.style.display = 'none';
+    success.style.display = 'block';
+    document.getElementById('success-text').textContent =
+      'This admin account was already set up, so we signed you in instead. Opening your dashboard now.';
+    setTimeout(() => { window.location.href = 'swavice-admin-dashboard.html'; }, 1200);
+    return true;
+  } catch (err) {
+    showError('This admin account already exists. Try signing in instead.');
+    return false;
+  }
+}
+
+function showError(msg) {
+  const box = document.getElementById('error-box');
+  box.textContent   = msg;
+  box.style.display = 'block';
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const id = a.getAttribute('href').slice(1);
+    const el = document.getElementById(id);
+    if (el) { e.preventDefault(); el.scrollIntoView({ behavior: 'smooth' }); }
+  });
+});
+
+document.querySelectorAll('[data-toggle-password]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const input = document.getElementById(btn.dataset.togglePassword);
+    if (!input) return;
+    const showing = input.type === 'text';
+    input.type = showing ? 'password' : 'text';
+    btn.textContent = showing ? '👁' : '🙈';
+    btn.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+    btn.setAttribute('aria-pressed', showing ? 'false' : 'true');
+  });
+});
+</script>
+</body>
+</html>
