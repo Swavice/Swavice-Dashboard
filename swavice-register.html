@@ -122,7 +122,7 @@ select option{background:#0C1526;color:var(--t1)}
 .download-section{padding:72px 24px;text-align:center;position:relative;overflow:hidden;width:100%}
 .download-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 800px 400px at 50% 50%,rgba(212,175,55,0.07) 0%,transparent 70%);pointer-events:none}
 .download-inner{max-width:720px;margin:0 auto;position:relative}
-.download-phones{display:flex;justify-content:center;gap:10px;margin-bottom:40px}
+.download-phones{display:flex;justify-content:center;gap:10px;margin-bottom:24px}
 .download-phone{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;background:var(--glass1);border:1px solid var(--glass-bdhi)}
 .download-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
 .store-btn{display:inline-flex;align-items:center;gap:12px;background:var(--elevated);border:1px solid var(--glass-bdhi);border-radius:14px;padding:12px 22px;text-decoration:none;color:var(--t1);transition:all .2s;min-width:170px}
@@ -347,16 +347,16 @@ footer{border-top:1px solid var(--glass-bd);padding:28px 32px;display:flex;justi
 
         <!-- Organisation details -->
         <div class="field-group">
-          <label>Organisation / Company Name <span>*</span></label>
+          <label for="org_name">Organisation / Company Name <span>*</span></label>
           <input type="text" id="org_name" placeholder="e.g. Acme Field Services" required />
         </div>
         <div class="form-row">
           <div class="field-group">
-            <label>Organisation Email <span>*</span></label>
+            <label for="org_email">Organisation Email <span>*</span></label>
             <input type="email" id="org_email" placeholder="info@acme.co.ke" required />
           </div>
           <div class="field-group">
-            <label>Country</label>
+            <label for="country">Country</label>
             <select id="country">
               <option value="KE" selected>🇰🇪 Kenya</option>
               <option value="TZ">🇹🇿 Tanzania</option>
@@ -375,23 +375,23 @@ footer{border-top:1px solid var(--glass-bd);padding:28px 32px;display:flex;justi
 
         <!-- Admin details -->
         <div class="field-group">
-          <label>Your Full Name <span>*</span></label>
+          <label for="admin_name">Your Full Name <span>*</span></label>
           <input type="text" id="admin_name" placeholder="Your full name" required />
         </div>
         <div class="field-group">
-          <label>Your Work Email <span>*</span></label>
+          <label for="admin_email">Your Work Email <span>*</span></label>
           <input type="email" id="admin_email" placeholder="you@acme.co.ke" required />
         </div>
         <div class="form-row">
           <div class="field-group">
-            <label>Password <span>*</span></label>
+            <label for="admin_password">Password <span>*</span></label>
             <div class="password-field">
               <input type="password" id="admin_password" placeholder="Min 8 characters" minlength="8" required />
               <button type="button" class="password-toggle" data-toggle-password="admin_password" aria-label="Show password" aria-pressed="false">👁</button>
             </div>
           </div>
           <div class="field-group">
-            <label>Confirm Password <span>*</span></label>
+            <label for="admin_password2">Confirm Password <span>*</span></label>
             <div class="password-field">
               <input type="password" id="admin_password2" placeholder="Repeat password" required />
               <button type="button" class="password-toggle" data-toggle-password="admin_password2" aria-label="Show password" aria-pressed="false">👁</button>
@@ -474,13 +474,16 @@ async function handleRegister(e) {
     form.style.display    = 'none';
     success.style.display = 'block';
     document.getElementById('success-text').textContent =
-      `${data.organisation.name} is ready. Sign in with ${admin_email} to open your dashboard and start adding your team.`;
+      `${data.organisation?.name || org_name} is ready. Sign in with ${admin_email} to open your dashboard and start adding your team.`;
 
   } catch (err) {
     showError(mapRegisterError(err.message));
   } finally {
     btn.textContent = 'Create Organisation →';
-    btn.disabled    = false;
+    // Only re-enable if we haven't already shown success (e.g. during redirect)
+    if (document.getElementById('success-box').style.display !== 'block') {
+      btn.disabled = false;
+    }
   }
 }
 
@@ -542,7 +545,9 @@ function showError(msg) {
 // Smooth scroll for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
-    const id = a.getAttribute('href').slice(1);
+    const href = a.getAttribute('href');
+    if (href === '#') { e.preventDefault(); return; } // placeholder links (e.g. store buttons)
+    const id = href.slice(1);
     const el = document.getElementById(id);
     if (el) { e.preventDefault(); el.scrollIntoView({ behavior: 'smooth' }); }
   });
