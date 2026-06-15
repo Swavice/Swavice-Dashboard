@@ -47,7 +47,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .sidebar-logo-text span{color:var(--orange);text-shadow:0 0 20px var(--orange-glow);}
 .sidebar-logo-sub{font-size:10px;color:var(--t3);margin-top:3px;letter-spacing:.5px}
 .sidebar-sec{font-size:10px;font-weight:600;color:var(--t4);text-transform:uppercase;letter-spacing:1.4px;padding:14px 20px 6px}
-.nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;margin:1px 8px;border-radius:var(--r-md);color:var(--t3);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s cubic-bezier(.4,0,.2,1);position:relative;user-select:none;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;margin:1px 8px;border-radius:var(--r-md);color:var(--t3);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s cubic-bezier(.4,0,.2,1);position:relative;-webkit-user-select:none;user-select:none;}
 .nav-item:hover{background:var(--glass-2);color:var(--t1);}
 .nav-item.active{background:linear-gradient(135deg,rgba(212,175,55,0.14),rgba(212,175,55,0.08));color:var(--t1);font-weight:600;box-shadow:0 2px 12px rgba(212,175,55,0.12);}
 .nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;background:linear-gradient(180deg,var(--orange),rgba(212,175,55,0.5));border-radius:0 3px 3px 0;box-shadow:0 0 8px var(--orange-glow);}
@@ -198,7 +198,7 @@ tbody tr:hover{background:rgba(255,255,255,0.03)}
 .t-info{flex:1}
 .t-name{font-size:13px;font-weight:600;color:var(--t1)}
 .t-sub{font-size:11px;color:var(--t3);margin-top:1px}
-.client-card{background:var(--glass-1);backdrop-filter:blur(20px);border:1px solid var(--glass-bd);border-radius:var(--r-lg);padding:16px;cursor:pointer;transition:all .2s;box-shadow:var(--sh-sm);}
+.client-card{background:var(--glass-1);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px solid var(--glass-bd);border-radius:var(--r-lg);padding:16px;cursor:pointer;transition:all .2s;box-shadow:var(--sh-sm);}
 .client-card:hover{border-color:rgba(212,175,55,0.3);box-shadow:var(--sh-md),0 0 24px rgba(212,175,55,0.08);transform:translateY(-2px);}
 .cl-name-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
 .cl-name{font-size:14px;font-weight:700;color:var(--t1)}
@@ -232,7 +232,7 @@ tbody tr:hover{background:rgba(255,255,255,0.03)}
 .fab{position:fixed;bottom:28px;right:28px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--orange),#c9a227);color:#080E1C;font-size:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;z-index:100;box-shadow:0 4px 28px var(--orange-glow),0 0 0 0 rgba(212,175,55,0.3);transition:transform .2s,box-shadow .2s;animation:fabPulse 3s infinite;}
 .fab:hover{transform:scale(1.1) translateY(-2px);box-shadow:0 8px 36px var(--orange-glow),0 0 0 10px rgba(212,175,55,0.08);animation:none}
 @keyframes fabPulse{0%{box-shadow:0 4px 28px var(--orange-glow),0 0 0 0 rgba(212,175,55,0.3)}70%{box-shadow:0 4px 28px var(--orange-glow),0 0 0 14px rgba(212,175,55,0)}100%{box-shadow:0 4px 28px var(--orange-glow),0 0 0 0 rgba(212,175,55,0)}}
-.overlay-bg{position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:499;display:none;backdrop-filter:blur(3px)}
+.overlay-bg{position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:499;display:none;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
 .overlay-bg.open{display:block}
 @media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}body,html{background:#fff!important;color:#1a1a2e!important;overflow:visible!important}body::before,body::after{display:none!important}.sidebar,.topbar,.fab,.modal-overlay,.toast-cont{display:none!important}.shell,.main,.content{display:block!important;height:auto!important;overflow:visible!important}.page{display:none!important}#print-target{display:block!important}}
 #pdf-preview-modal .modal{max-width:820px;max-height:96vh;background:#fff;border:1px solid #e5e7eb;box-shadow:0 20px 60px rgba(0,0,0,0.4);}
@@ -693,7 +693,7 @@ tbody tr:hover{background:rgba(255,255,255,0.03)}
       <div style="font-size:28px;font-weight:800;color:var(--t1);letter-spacing:-1px">Swa<span style="color:var(--orange);text-shadow:0 0 20px var(--orange-glow)">vice</span></div>
       <div style="font-size:12px;color:var(--t3);margin-top:5px">Command Center — Supervisor Access</div>
     </div>
-    <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(24px);border:1px solid var(--glass-bd-hi);border-radius:var(--r-xl);padding:26px;box-shadow:var(--sh-xl);position:relative;overflow:hidden">
+    <div style="background:rgba(255,255,255,0.05);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);border:1px solid var(--glass-bd-hi);border-radius:var(--r-xl);padding:26px;box-shadow:var(--sh-xl);position:relative;overflow:hidden">
       <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(212,175,55,0.4),transparent)"></div>
       <div style="font-size:17px;font-weight:700;color:var(--t1);margin-bottom:20px;letter-spacing:-.3px">Sign in to continue</div>
       <div class="fg"><div class="flabel">Email address</div><input type="email" class="finput" id="l-email" placeholder="you@company.com" autocomplete="email"/></div>
