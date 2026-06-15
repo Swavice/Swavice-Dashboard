@@ -69,6 +69,12 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .tb-search input::placeholder{color:var(--t3)}
 .tb-btn{width:36px;height:36px;border-radius:50%;background:var(--glass-1);border:1px solid var(--glass-bd);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:var(--t2);transition:all .15s;position:relative;}
 .tb-btn:hover{background:var(--glass-2);border-color:var(--glass-bd-hi);color:var(--t1)}
+.notif-panel{position:absolute;top:46px;right:0;width:340px;max-height:420px;overflow-y:auto;background:var(--elevated);border:1px solid var(--glass-bd);border-radius:var(--r-lg);box-shadow:0 20px 50px rgba(0,0,0,0.45);z-index:50;padding:8px 14px;}
+.notif-panel-header{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:var(--t1);text-transform:uppercase;letter-spacing:1px;padding:8px 2px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.notif-panel-footer{text-align:center;padding:8px 2px 4px;border-top:1px solid rgba(255,255,255,0.06);margin-top:4px}
+.notif-panel-footer a{font-size:12px;color:var(--orange);cursor:pointer;font-weight:600}
+.nh-item.unread{background:rgba(212,175,55,0.05);border-radius:var(--r-md);margin:0 -8px;padding:12px 8px}
+.nh-item{cursor:pointer}
 .notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--orange);border-radius:50%;border:1.5px solid var(--bg);box-shadow:0 0 8px var(--orange-glow);animation:notifPulse 2.5s ease-in-out infinite;}
 @keyframes notifPulse{0%,100%{box-shadow:0 0 8px var(--orange-glow)}50%{box-shadow:0 0 16px var(--orange-glow),0 0 4px rgba(212,175,55,0.6)}}
 .online-dot{width:7px;height:7px;border-radius:50%;background:var(--green);border:1.5px solid var(--bg);position:absolute;bottom:0;right:0;box-shadow:0 0 6px var(--green-glow);}
@@ -167,6 +173,10 @@ tbody tr:hover{background:rgba(255,255,255,0.03)}
 .fchip{padding:5px 12px;border-radius:var(--r-full);font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--glass-bd);background:var(--glass-1);color:var(--t3);transition:all .15s;white-space:nowrap;}
 .fchip:hover{border-color:var(--glass-bd-hi);color:var(--t1)}
 .fchip.active{background:var(--orange-dim);border-color:rgba(212,175,55,0.4);color:var(--orange);font-weight:600;}
+.view-toggle{display:flex;gap:2px;background:var(--glass-1);border:1px solid var(--glass-bd);border-radius:var(--r-md);padding:3px;}
+.vt-btn{width:30px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:8px;border:none;background:transparent;color:var(--t3);cursor:pointer;font-size:14px;transition:all .15s;}
+.vt-btn:hover{color:var(--t1)}
+.vt-btn.active{background:var(--orange-dim);color:var(--orange)}
 .search-wrap{display:flex;align-items:center;gap:7px;background:var(--glass-1);border:1px solid var(--glass-bd);border-radius:var(--r-md);padding:0 11px;height:34px;flex:1;max-width:260px;transition:all .15s;}
 .search-wrap:focus-within{border-color:rgba(212,175,55,0.4);box-shadow:0 0 0 3px rgba(212,175,55,0.08);}
 .search-wrap input{background:none;border:none;outline:none;font-size:13px;color:var(--t1);width:100%}
@@ -276,8 +286,13 @@ tbody tr:hover{background:rgba(255,255,255,0.03)}
       <span style="color:var(--t3);font-size:13px">🔍</span>
       <input type="text" placeholder="Search reports, clients…" id="global-search" oninput="globalSearch(this.value)"/>
     </div>
-    <div class="tb-btn" onclick="openModal('m-notify')" title="Send notification">
+    <div class="tb-btn" id="notif-bell" onclick="toggleNotifPanel(event)" title="Notifications">
       🔔<span class="notif-dot" id="notif-dot" style="display:none"></span>
+      <div class="notif-panel" id="notif-panel" style="display:none" onclick="event.stopPropagation()">
+        <div class="notif-panel-header"><span>New Reports</span></div>
+        <div id="notif-panel-body"></div>
+        <div class="notif-panel-footer"><a onclick="closeNotifPanel();showPage('notifications', document.querySelector('[onclick*=&quot;notifications&quot;]'))">View all notifications</a></div>
+      </div>
     </div>
     <button class="btn btn-primary btn-sm" onclick="openModal('m-assign')">+ Assign Job</button>
   </div>
@@ -362,13 +377,25 @@ tbody tr:hover{background:rgba(255,255,255,0.03)}
 
     <!-- CLIENTS -->
     <div class="page" id="page-clients">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:10px;flex-wrap:wrap">
         <div class="search-wrap"><span style="color:var(--t3)">🔍</span><input type="text" placeholder="Search clients…" id="cl-search" oninput="filterClients()"/></div>
-        <!-- FIX: calls openAddClient() directly, not openModal() -->
-        <button class="btn btn-primary" onclick="openAddClient()">+ Add Client</button>
+        <div style="display:flex;gap:8px;align-items:center;margin-left:auto">
+          <div class="view-toggle" id="cl-view-toggle">
+            <button class="vt-btn active" data-view="grid" onclick="setClientView('grid')" title="Grid view">⊞</button>
+            <button class="vt-btn" data-view="list" onclick="setClientView('list')" title="List view">☰</button>
+          </div>
+          <!-- FIX: calls openAddClient() directly, not openModal() -->
+          <button class="btn btn-primary" onclick="openAddClient()">+ Add Client</button>
+        </div>
       </div>
       <div id="cl-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">
         <div class="empty"><div class="empty-icon">⏳</div><div class="empty-title">Loading…</div></div>
+      </div>
+      <div class="card" id="cl-list-wrap" style="display:none">
+        <div class="tbl-wrap">
+          <table><thead><tr><th>Client</th><th>Location</th><th>Reports</th><th>Done</th><th>Active</th><th>Progress</th><th></th></tr></thead>
+          <tbody id="cl-body"></tbody></table>
+        </div>
       </div>
     </div>
 
@@ -567,6 +594,7 @@ tbody tr:hover{background:rgba(255,255,255,0.03)}
     </div>
     <div class="modal-body">
       <input type="hidden" id="er-id"/>
+      <input type="hidden" id="er-cf"/>
       <div style="background:rgba(61,126,255,0.08);border:1px solid rgba(61,126,255,0.2);border-radius:var(--r-md);padding:10px 13px;font-size:12px;color:var(--blue-bright);margin-bottom:14px">
         ℹ️ Editing preserves the original creator, technician assigned, and submission timestamp.
       </div>
@@ -689,6 +717,7 @@ const SUPA_URL  = 'https://wkauguppaqpxtifdkykb.supabase.co';
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrYXVndXBwYXFweHRpZmRreWtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MDA1NDIsImV4cCI6MjA5MDM3NjU0Mn0.DtAB-6hfglHpGZrP97FsEUzE_ZiTY4E6-bo7w7hk2sI';
 
 let token = localStorage.getItem('swavice_admin_token') || localStorage.getItem('br_token') || '';
+let refreshToken = localStorage.getItem('swavice_admin_refresh') || '';
 let me = null, reports = [], clients = [], techs = [], nType = 'alert', nRecips = [], rFilter = 'all';
 
 // ── Safe data stores (avoids inline onclick string-injection) ──────
@@ -699,7 +728,7 @@ const reportDataMap = {};  // id → report summary row
 // ═══════════════════════════════════════════════════════════════════
 // API HELPER
 // ═══════════════════════════════════════════════════════════════════
-async function api(path, opts = {}) {
+async function api(path, opts = {}, _retry = false) {
   const res = await fetch(SUPA_URL + path, {
     ...opts,
     headers: {
@@ -715,8 +744,52 @@ async function api(path, opts = {}) {
   let data = null;
   try { data = text ? JSON.parse(text) : null; }
   catch { data = text ? { message: text } : null; }
-  if (!res.ok) throw new Error(data?.message || data?.error_description || `HTTP ${res.status}`);
+  if (!res.ok) {
+    // FIX: session persistence — if the access token expired (401/JWT errors),
+    // try a silent refresh using the stored refresh token and retry once.
+    const msg = String(data?.message || data?.error_description || '').toLowerCase();
+    const isAuthErr = res.status === 401 || msg.includes('jwt') || msg.includes('token is expired');
+    if (isAuthErr && !_retry && refreshToken && !path.startsWith('/auth/v1/token')) {
+      const ok = await refreshSession();
+      if (ok) return api(path, opts, true);
+    }
+    throw new Error(data?.message || data?.error_description || `HTTP ${res.status}`);
+  }
   return data;
+}
+
+// ─── Silent session refresh ────────────────────────────────────────
+async function refreshSession() {
+  if (!refreshToken) return false;
+  try {
+    const res = await fetch(`${SUPA_URL}/auth/v1/token?grant_type=refresh_token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_ANON },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
+    if (!res.ok) throw new Error('refresh failed');
+    const data = await res.json();
+    if (!data?.access_token) throw new Error('refresh failed');
+    setSession(data);
+    return true;
+  } catch {
+    clearSession();
+    return false;
+  }
+}
+
+function setSession(data) {
+  token = data.access_token;
+  refreshToken = data.refresh_token || refreshToken;
+  localStorage.setItem('swavice_admin_token', token);
+  if (data.refresh_token) localStorage.setItem('swavice_admin_refresh', data.refresh_token);
+}
+
+function clearSession() {
+  token = ''; refreshToken = '';
+  localStorage.removeItem('swavice_admin_token');
+  localStorage.removeItem('swavice_admin_refresh');
+  localStorage.removeItem('br_token');
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -742,18 +815,18 @@ async function doLogin() {
   btn.textContent = 'Signing in…'; btn.disabled = true; errEl.style.display = 'none';
   try {
     const data = await api('/auth/v1/token?grant_type=password', { method: 'POST', body: JSON.stringify({ email, password: pw }) });
-    token = data.access_token;
-    localStorage.setItem('swavice_admin_token', token);
+    setSession(data);
     me = data.user;
     const profiles = await api(`/rest/v1/profiles?id=eq.${me.id}&select=*`);
     const profile  = profiles?.[0];
     if (!profile) throw new Error('Profile not found. Contact admin.');
     if (profile.role === 'technician') {
-      localStorage.removeItem('swavice_admin_token');
+      clearSession();
       throw new Error('Access denied. Technicians use the mobile app.');
     }
     me = { ...me, ...profile };
     setUserUI(); closeModal('m-login'); initApp();
+    setInterval(refreshSession, 45 * 60 * 1000);
   } catch(e) {
     errEl.textContent = mapAuthError(e.message); errEl.style.display = 'block';
   } finally { btn.textContent = 'Sign In'; btn.disabled = false; }
@@ -762,7 +835,7 @@ async function doLogin() {
 async function handleLogout() {
   if (!confirm('Sign out?')) return;
   try { await api('/auth/v1/logout', { method: 'POST' }); } catch {}
-  localStorage.removeItem('swavice_admin_token'); localStorage.removeItem('br_token');
+  clearSession();
   token = ''; me = null; window.location.reload();
 }
 
@@ -781,6 +854,7 @@ function setUserUI() {
 // INIT & REALTIME
 // ═══════════════════════════════════════════════════════════════════
 async function initApp() {
+  setClientView(localStorage.getItem('swavice_cl_view') || 'grid');
   await Promise.all([loadDash(), loadReports(), loadClients(), loadTechs(), loadNotifications()]);
   initRealtime(); updatePresence();
 }
@@ -1019,14 +1093,15 @@ async function updateStatus(id, status) {
 // FIX: fetches only non-sensitive fields; technician_id/created_by never touched
 async function openEditReport(id) {
   try {
-    const data = await api(`/rest/v1/reports?id=eq.${id}&select=id,client_name,client_location,job_type,status,priority,notes`);
+    const data = await api(`/rest/v1/reports?id=eq.${id}&select=id,client_name,client_location,job_type,status,priority,custom_fields`);
     const r = data?.[0]; if (!r) { toast('error','Error','Report not found'); return; }
     document.getElementById('er-id').value      = r.id;
+    document.getElementById('er-cf').value      = JSON.stringify(r.custom_fields || {});
     document.getElementById('er-client').value  = r.client_name || '';
     document.getElementById('er-loc').value     = r.client_location || '';
     document.getElementById('er-status').value  = r.status || 'draft';
     document.getElementById('er-prio').value    = r.priority || 'normal';
-    document.getElementById('er-notes').value   = r.notes || '';
+    document.getElementById('er-notes').value   = (r.custom_fields && r.custom_fields.admin_notes) || '';
     // Set job type — add custom option if not in list
     const sel = document.getElementById('er-jtype');
     let found = Array.from(sel.options).find(o => o.text === r.job_type || o.value === r.job_type);
@@ -1046,10 +1121,14 @@ async function saveEditReport() {
   const notes   = document.getElementById('er-notes').value.trim();
   if (!client || !loc || !jobType) { toast('warning','Required','Fill in client name, location and job type.'); return; }
   try {
+    // FIX: 'notes' is not a real column on reports — admin notes are stored in custom_fields.admin_notes
+    let cf = {};
+    try { cf = JSON.parse(document.getElementById('er-cf').value || '{}') || {}; } catch { cf = {}; }
+    if (notes) cf.admin_notes = notes; else delete cf.admin_notes;
     // CRITICAL: technician_id, created_by, assigned_by, assigned_at are intentionally absent
     await api(`/rest/v1/reports?id=eq.${id}`, {
       method: 'PATCH', prefer: 'return=minimal',
-      body: JSON.stringify({ client_name: client, client_location: loc, job_type: jobType, status, priority: prio, notes: notes || null, updated_at: new Date().toISOString() }),
+      body: JSON.stringify({ client_name: client, client_location: loc, job_type: jobType, status, priority: prio, custom_fields: cf, updated_at: new Date().toISOString() }),
     });
     closeModal('m-edit-report');
     toast('success','Report Updated','Changes saved. Original technician & creator preserved.');
@@ -1098,11 +1177,45 @@ async function loadClients() {
   } catch(e) { console.warn('Clients:', e.message); }
 }
 
+// ─── Grid / List view toggle (clients) ─────────────────────────────
+function setClientView(mode) {
+  localStorage.setItem('swavice_cl_view', mode);
+  document.querySelectorAll('#cl-view-toggle .vt-btn').forEach(b => b.classList.toggle('active', b.dataset.view === mode));
+  document.getElementById('cl-grid').style.display      = mode === 'grid' ? 'grid' : 'none';
+  document.getElementById('cl-list-wrap').style.display = mode === 'list' ? 'block' : 'none';
+}
+
 function filterClients() {
   const q    = document.getElementById('cl-search')?.value.toLowerCase() || '';
   const list = q ? clients.filter(c => c.name.toLowerCase().includes(q) || c.location.toLowerCase().includes(q)) : clients;
   const grid = document.getElementById('cl-grid');
-  if (!list.length) { grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🏢</div><div class="empty-title">No clients yet</div><div class="empty-sub">Clients appear when reports are submitted or added manually</div></div>`; return; }
+  const body = document.getElementById('cl-body');
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🏢</div><div class="empty-title">No clients yet</div><div class="empty-sub">Clients appear when reports are submitted or added manually</div></div>`;
+    body.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="empty-icon">🏢</div><div class="empty-title">No clients yet</div><div class="empty-sub">Clients appear when reports are submitted or added manually</div></div></td></tr>`;
+    return;
+  }
+  body.innerHTML = list.map(c => {
+    const total  = c.reports.length;
+    const done   = c.reports.filter(r => r.status === 'completed' || r.status === 'reviewed').length;
+    const inprog = c.reports.filter(r => r.status === 'in_progress').length;
+    const pct    = total ? Math.round(done / total * 100) : 0;
+    const did    = c.dedicated?.id || '';
+    return `<tr onclick="filterByClient('${esc(c.name)}')" style="cursor:pointer">
+      <td><div style="display:flex;align-items:center;gap:8px"><div style="font-weight:600;color:var(--t1)">${esc(c.name)}</div>${did ? `<span class="badge" style="background:var(--green-dim);color:var(--green);border:1px solid rgba(16,185,129,0.2);font-size:9px">Registered</span>` : `<span class="badge" style="background:rgba(255,255,255,0.05);color:var(--t3);border:1px solid var(--glass-bd);font-size:9px">Auto</span>`}</div></td>
+      <td style="color:var(--t2)">📍 ${esc(c.location||'—')}</td>
+      <td style="text-align:center;color:var(--t2)">${total}</td>
+      <td style="text-align:center;color:var(--green)">${done}</td>
+      <td style="text-align:center;color:var(--amber)">${inprog}</td>
+      <td style="min-width:100px"><div style="display:flex;align-items:center;gap:8px"><div class="prog" style="height:4px;flex:1"><div class="prog-fill" style="width:${pct}%;background:linear-gradient(90deg,var(--orange),#c9a227)"></div></div><span style="font-size:11px;color:var(--t3)">${pct}%</span></div></td>
+      <td onclick="event.stopPropagation()">
+        ${did
+          ? `<div style="display:flex;gap:4px"><button class="btn btn-ghost btn-sm" onclick="openEditClient('${did}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteClient('${did}')">🗑</button></div>`
+          : `<button class="btn btn-ghost btn-sm" style="font-size:11px" onclick="openAddClient()">+ Register</button>`
+        }
+      </td>
+    </tr>`;
+  }).join('');
   grid.innerHTML = list.map(c => {
     const total  = c.reports.length;
     const done   = c.reports.filter(r => r.status === 'completed' || r.status === 'reviewed').length;
@@ -1345,11 +1458,56 @@ function populateTechDropdowns() {
 async function loadNotifications() {
   try {
     const data = await api('/rest/v1/notifications?select=*,profiles!sent_by(full_name)&order=created_at.desc&limit=60') || [];
-    const unread = data.filter(n => !n.is_read).length;
-    setText('badge-notifs', data.length);
-    if (unread > 0) document.getElementById('notif-dot').style.display = 'block';
     renderNotifHistory(data);
+    // Bell feed = new reports submitted by technicians, addressed to me
+    const feed = data.filter(n => n.type === 'report_submitted' && n.user_id === me?.id);
+    const unread = feed.filter(n => !n.is_read).length;
+    setText('badge-notifs', unread);
+    document.getElementById('notif-dot').style.display = unread > 0 ? 'block' : 'none';
+    renderNotifPanel(feed);
   } catch(e) { console.warn('Notifs:', e.message); }
+}
+
+// ─── Bell dropdown: new reports from technicians ───────────────────
+function renderNotifPanel(feed) {
+  const el = document.getElementById('notif-panel-body');
+  if (!el) return;
+  if (!feed.length) { el.innerHTML = `<div class="empty" style="padding:18px 4px"><div class="empty-icon">🔔</div><div class="empty-title">No new reports</div><div class="empty-sub">Technician submissions appear here</div></div>`; return; }
+  el.innerHTML = feed.slice(0, 8).map(n => `
+    <div class="nh-item ${n.is_read ? '' : 'unread'}" onclick="openNotifReport('${n.id}','${n.related_report_id||''}')">
+      <div class="nh-icon" style="background:rgba(16,185,129,0.12)">✅</div>
+      <div style="flex:1">
+        <div class="nh-title">${esc(n.title)}</div>
+        <div class="nh-body">${esc(n.body||'')}</div>
+        <div class="nh-meta"><span class="nh-time">${fDT(n.created_at)}</span></div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleNotifPanel(e) {
+  e?.stopPropagation();
+  const panel = document.getElementById('notif-panel');
+  const opening = panel.style.display === 'none' || !panel.style.display;
+  panel.style.display = opening ? 'block' : 'none';
+  if (opening) loadNotifications();
+}
+
+function closeNotifPanel() {
+  const panel = document.getElementById('notif-panel');
+  if (panel) panel.style.display = 'none';
+}
+
+document.addEventListener('click', (e) => {
+  const bell = document.getElementById('notif-bell');
+  if (bell && !bell.contains(e.target)) closeNotifPanel();
+});
+
+// Open the related report from the bell dropdown and mark the notification read
+async function openNotifReport(notifId, reportId) {
+  closeNotifPanel();
+  try { await api(`/rest/v1/notifications?id=eq.${notifId}`, { method:'PATCH', prefer:'return=minimal', body: JSON.stringify({ is_read:true }) }); } catch {}
+  loadNotifications();
+  if (reportId) { showPage('reports', document.querySelector('[onclick*="\'reports\'"]')); openRDetail(reportId); }
 }
 
 function renderNotifHistory(data) {
@@ -1515,7 +1673,10 @@ async function loadAudit() {
     const tbody = document.getElementById('audit-body');
     if (!data.length) { tbody.innerHTML = `<tr><td colspan="5"><div class="empty"><div class="empty-icon">📜</div><div class="empty-title">No audit logs yet</div></div></td></tr>`; return; }
     tbody.innerHTML = data.map(a => {
-      let nd = ''; try { nd = JSON.stringify(JSON.parse(a.new_data||'{}')).slice(0, 80); } catch {}
+      // FIX: new_data/old_data come back from PostgREST as already-parsed JSON
+      // objects (jsonb columns) — JSON.parse() on an object always threw,
+      // leaving Details blank. Just stringify what we got.
+      let nd = ''; try { nd = JSON.stringify(a.new_data || {}).slice(0, 80); } catch {}
       return `<tr>
         <td><div style="display:flex;align-items:center;gap:6px"><div class="u-avatar" style="width:22px;height:22px;font-size:9px">${initials(a.profiles?.full_name||'?')}</div><span style="color:var(--t2)">${esc(a.profiles?.full_name||'System')}</span></div></td>
         <td style="font-family:var(--mono);font-size:11px;color:var(--orange)">${esc(a.action)}</td>
@@ -1718,6 +1879,7 @@ document.querySelectorAll('[data-toggle-password]').forEach(btn => {
 // ═══════════════════════════════════════════════════════════════════
 window.addEventListener('load', async () => {
   token = localStorage.getItem('swavice_admin_token') || localStorage.getItem('br_token') || '';
+  refreshToken = localStorage.getItem('swavice_admin_refresh') || '';
   if (!token) return;
   try {
     const data     = await api('/auth/v1/user');
@@ -1727,9 +1889,11 @@ window.addEventListener('load', async () => {
     if (profile.role === 'technician') throw new Error('Access denied');
     me = { ...data, ...profile };
     setUserUI(); closeModal('m-login'); initApp();
+    // FIX: keep the session alive — proactively refresh the access token
+    // before it expires so users aren't logged out after ~1hr of inactivity.
+    setInterval(refreshSession, 45 * 60 * 1000);
   } catch(e) {
-    localStorage.removeItem('swavice_admin_token');
-    localStorage.removeItem('br_token');
+    clearSession();
     token = '';
   }
 });
