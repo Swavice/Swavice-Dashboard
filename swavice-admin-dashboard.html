@@ -754,31 +754,61 @@ async function api(path, opts = {}, _retry = false) {
     if (isAuthErr && !_retry && refreshToken && !path.startsWith('/auth/v1/token')) {
       const ok = await refreshSession();
       if (ok) return api(path, opts, true);
+      // Refresh failed (likely offline) — throw a generic network error so
+      // callers don't mistake this for a hard auth failure and wipe the session.
+      throw new Error('Session refresh failed — please check your connection');
     }
     throw new Error(data?.message || data?.error_description || `HTTP ${res.status}`);
   }
   return data;
 }
 
-// ─── Silent session refresh ────────────────────────────────────────
-async function refreshSession() {
-  if (!refreshToken) return false;
+// ─── JWT expiry helper ────────────────────────────────────────────
+// Returns true if the stored access token is missing or expired (or
+// expires within the given grace period in ms). Reads the `exp` claim
+// directly from the JWT payload so we never need to wait for a 401.
+function isTokenExpired(graceMs = 0) {
+  if (!token) return true;
   try {
-    const res = await fetch(`${SUPA_URL}/auth/v1/token?grant_type=refresh_token`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_ANON },
-      body: JSON.stringify({ refresh_token: refreshToken }),
-    });
-    if (!res.ok) throw new Error('refresh failed');
-    const data = await res.json();
-    if (!data?.access_token) throw new Error('refresh failed');
-    setSession(data);
-    return true;
-  } catch {
-    clearSession();
-    return false;
-  }
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return (payload.exp * 1000) <= (Date.now() + graceMs);
+  } catch { return true; }
 }
+
+// ─── Silent session refresh ────────────────────────────────────────
+let _refreshing = null; // deduplicate concurrent refresh calls
+async function refreshSession() {
+  if (_refreshing) return _refreshing;
+  if (!refreshToken) return false;
+  _refreshing = (async () => {
+    try {
+      const res = await fetch(`${SUPA_URL}/auth/v1/token?grant_type=refresh_token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': SUPA_ANON },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
+      // Only clear session on definitive auth rejections (4xx).
+      // Network errors / 5xx leave tokens intact — next reload or tick can succeed.
+      if (res.status >= 400 && res.status < 500) { clearSession(); return false; }
+      if (!res.ok) return false;
+      const data = await res.json();
+      if (!data?.access_token) return false;
+      setSession(data);
+      return true;
+    } catch {
+      // Fetch threw (offline/timeout) — leave tokens intact
+      return false;
+    } finally { _refreshing = null; }
+  })();
+  return _refreshing;
+}
+
+// Refresh token when user comes back to a background tab
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && refreshToken && isTokenExpired(5 * 60 * 1000)) {
+    refreshSession();
+  }
+});
 
 function setSession(data) {
   token = data.access_token;
@@ -1883,9 +1913,24 @@ document.querySelectorAll('[data-toggle-password]').forEach(btn => {
 // BOOT
 // ═══════════════════════════════════════════════════════════════════
 window.addEventListener('load', async () => {
-  token = localStorage.getItem('swavice_admin_token') || localStorage.getItem('br_token') || '';
+  token        = localStorage.getItem('swavice_admin_token') || localStorage.getItem('br_token') || '';
   refreshToken = localStorage.getItem('swavice_admin_refresh') || '';
-  if (!token) return;
+
+  // Nothing stored at all — show login immediately
+  if (!token && !refreshToken) return;
+
+  // Proactively refresh if the access token is missing OR already expired
+  // (or will expire in the next 5 minutes). We do this BEFORE any API call
+  // so we never hit a 401 on boot and never need to rely on error-message
+  // parsing to decide whether to clear the session.
+  if (isTokenExpired(5 * 60 * 1000)) {
+    const ok = await refreshSession();
+    // If refresh failed AND we have no usable token, bail to login.
+    // If it failed due to a network error, token may still be in-date —
+    // isTokenExpired() with 0-grace will catch that below.
+    if (!ok && isTokenExpired()) return;
+  }
+
   try {
     const data     = await api('/auth/v1/user');
     const profiles = await api(`/rest/v1/profiles?id=eq.${data.id}&select=*`);
@@ -1894,12 +1939,19 @@ window.addEventListener('load', async () => {
     if (profile.role === 'technician') throw new Error('Access denied');
     me = { ...data, ...profile };
     setUserUI(); closeModal('m-login'); initApp();
-    // FIX: keep the session alive — proactively refresh the access token
-    // before it expires so users aren't logged out after ~1hr of inactivity.
-    setInterval(refreshSession, 45 * 60 * 1000);
+    // Refresh every 30 min while the tab is open (well inside the 1-hr expiry)
+    setInterval(refreshSession, 30 * 60 * 1000);
   } catch(e) {
-    clearSession();
-    token = '';
+    // Only wipe stored tokens for definitive permission/access failures.
+    // Leave them intact for network errors so a reload can recover.
+    const msg = String(e.message || '').toLowerCase();
+    if (msg.includes('access denied') || msg.includes('profile not found')) {
+      clearSession();
+    }
+    // JWT errors are NOT listed here — if we reach this catch with a JWT
+    // error it means the token was valid on boot but expired mid-load and
+    // the api() retry also failed (network issue). Tokens stay — next reload
+    // will refresh proactively again.
   }
 });
 </script>
