@@ -585,22 +585,27 @@ tbody tr:hover{background:rgba(255,255,255,0.03)}
 
 <!-- Edit Report -->
 <div class="modal-overlay" id="m-edit-report">
-  <div class="modal">
+  <div class="modal modal-lg">
     <div class="modal-header">
       <div>
         <div class="modal-title">Edit Report</div>
-        <div class="modal-sub">Original technician &amp; timestamps are preserved</div>
+        <div class="modal-sub">Original technician &amp; submission timestamp are preserved</div>
       </div>
       <button class="modal-close" onclick="closeModal('m-edit-report')">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="er-id"/>
       <input type="hidden" id="er-cf"/>
-      <div style="background:rgba(61,126,255,0.08);border:1px solid rgba(61,126,255,0.2);border-radius:var(--r-md);padding:10px 13px;font-size:12px;color:var(--blue-bright);margin-bottom:14px">
-        ℹ️ Editing preserves the original creator, technician assigned, and submission timestamp.
+      <div style="background:rgba(61,126,255,0.08);border:1px solid rgba(61,126,255,0.2);border-radius:var(--r-md);padding:10px 13px;font-size:12px;color:var(--blue-bright);margin-bottom:16px">
+        ℹ️ You can edit all report fields below. The original creator, technician, and submission date are preserved.
       </div>
-      <div class="fg"><div class="flabel">Client Name <span>*</span></div><input type="text" class="finput" id="er-client" placeholder="Client name"/></div>
-      <div class="fg"><div class="flabel">Site Location <span>*</span></div><input type="text" class="finput" id="er-loc" placeholder="Location"/></div>
+
+      <!-- ── Section: Job Info ── -->
+      <div style="font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Job Information</div>
+      <div class="form-row">
+        <div class="fg"><div class="flabel">Job Title</div><input type="text" class="finput" id="er-jtitle" placeholder="e.g. Annual boiler service"/></div>
+        <div class="fg"><div class="flabel">Job Number</div><input type="text" class="finput" id="er-jnum" placeholder="e.g. JOB-0042"/></div>
+      </div>
       <div class="fg"><div class="flabel">Job Type <span>*</span></div>
         <select class="fselect" id="er-jtype">
           <option value="">— Select —</option>
@@ -625,7 +630,31 @@ tbody tr:hover{background:rgba(255,255,255,0.03)}
           </select>
         </div>
       </div>
-      <div class="fg"><div class="flabel">Admin Notes</div><textarea class="ftextarea" id="er-notes" rows="3" placeholder="Internal notes…"></textarea></div>
+      <div class="form-row">
+        <div class="fg"><div class="flabel">Job Started</div><input type="datetime-local" class="finput" id="er-started"/></div>
+        <div class="fg"><div class="flabel">Job Ended</div><input type="datetime-local" class="finput" id="er-ended"/></div>
+      </div>
+
+      <!-- ── Section: Client ── -->
+      <div style="font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin:16px 0 10px">Client Details</div>
+      <div class="fg"><div class="flabel">Client Name <span>*</span></div><input type="text" class="finput" id="er-client" placeholder="Client name"/></div>
+      <div class="fg"><div class="flabel">Site Location <span>*</span></div><input type="text" class="finput" id="er-loc" placeholder="Location"/></div>
+      <div class="form-row">
+        <div class="fg"><div class="flabel">Client Contact</div><input type="text" class="finput" id="er-contact" placeholder="Phone or email"/></div>
+        <div class="fg"><div class="flabel">Client Signature Name</div><input type="text" class="finput" id="er-signed" placeholder="Name of person who signed"/></div>
+      </div>
+
+      <!-- ── Section: Report Content ── -->
+      <div style="font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin:16px 0 10px">Report Content</div>
+      <div class="fg"><div class="flabel">Issue Description</div><textarea class="ftextarea" id="er-issue" rows="3" placeholder="Describe the issue or reason for the visit…"></textarea></div>
+      <div class="fg"><div class="flabel">Actions Taken</div><textarea class="ftextarea" id="er-actions" rows="3" placeholder="What was done on site…"></textarea></div>
+      <div class="fg"><div class="flabel">Findings</div><textarea class="ftextarea" id="er-findings" rows="3" placeholder="Observations and findings…"></textarea></div>
+      <div class="fg"><div class="flabel">Recommendations</div><textarea class="ftextarea" id="er-recs" rows="3" placeholder="Recommended next steps…"></textarea></div>
+
+      <!-- ── Section: Admin Notes ── -->
+      <div style="font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin:16px 0 10px">Admin Notes (Internal)</div>
+      <div class="fg"><textarea class="ftextarea" id="er-notes" rows="2" placeholder="Internal notes — not visible to client…"></textarea></div>
+
       <div class="modal-footer">
         <button class="btn btn-ghost" onclick="closeModal('m-edit-report')">Cancel</button>
         <button class="btn btn-primary" onclick="saveEditReport()">💾 Save Changes</button>
@@ -1128,16 +1157,32 @@ async function updateStatus(id, status) {
 // FIX: fetches only non-sensitive fields; technician_id/created_by never touched
 async function openEditReport(id) {
   try {
-    const data = await api(`/rest/v1/reports?id=eq.${id}&select=id,client_name,client_location,job_type,status,priority,custom_fields`);
+    const data = await api(`/rest/v1/reports?id=eq.${id}&select=id,client_name,client_location,client_contact,job_type,job_title,job_number,status,priority,issue_description,actions_taken,findings,recommendations,job_started_at,job_ended_at,client_name_signed,custom_fields`);
     const r = data?.[0]; if (!r) { toast('error','Error','Report not found'); return; }
-    document.getElementById('er-id').value      = r.id;
-    document.getElementById('er-cf').value      = JSON.stringify(r.custom_fields || {});
-    document.getElementById('er-client').value  = r.client_name || '';
-    document.getElementById('er-loc').value     = r.client_location || '';
-    document.getElementById('er-status').value  = r.status || 'draft';
-    document.getElementById('er-prio').value    = r.priority || 'normal';
-    document.getElementById('er-notes').value   = (r.custom_fields && r.custom_fields.admin_notes) || '';
-    // Set job type — add custom option if not in list
+    document.getElementById('er-id').value       = r.id;
+    document.getElementById('er-cf').value       = JSON.stringify(r.custom_fields || {});
+    // Job info
+    document.getElementById('er-jtitle').value   = r.job_title || '';
+    document.getElementById('er-jnum').value     = r.job_number || '';
+    document.getElementById('er-status').value   = r.status || 'draft';
+    document.getElementById('er-prio').value     = r.priority || 'normal';
+    // Timestamps — convert to datetime-local format (YYYY-MM-DDTHH:mm)
+    const toLocal = iso => iso ? new Date(iso).toISOString().slice(0,16) : '';
+    document.getElementById('er-started').value  = toLocal(r.job_started_at);
+    document.getElementById('er-ended').value    = toLocal(r.job_ended_at);
+    // Client
+    document.getElementById('er-client').value   = r.client_name || '';
+    document.getElementById('er-loc').value      = r.client_location || '';
+    document.getElementById('er-contact').value  = r.client_contact || '';
+    document.getElementById('er-signed').value   = r.client_name_signed || '';
+    // Report content
+    document.getElementById('er-issue').value    = r.issue_description || '';
+    document.getElementById('er-actions').value  = r.actions_taken || '';
+    document.getElementById('er-findings').value = r.findings || '';
+    document.getElementById('er-recs').value     = r.recommendations || '';
+    // Admin notes (stored in custom_fields)
+    document.getElementById('er-notes').value    = (r.custom_fields && r.custom_fields.admin_notes) || '';
+    // Job type — add as custom option if not already in list
     const sel = document.getElementById('er-jtype');
     let found = Array.from(sel.options).find(o => o.text === r.job_type || o.value === r.job_type);
     if (!found && r.job_type) { const o = new Option(r.job_type, r.job_type); sel.add(o); found = o; }
@@ -1151,22 +1196,46 @@ async function saveEditReport() {
   const client  = document.getElementById('er-client').value.trim();
   const loc     = document.getElementById('er-loc').value.trim();
   const jobType = document.getElementById('er-jtype').value;
-  const status  = document.getElementById('er-status').value;
-  const prio    = document.getElementById('er-prio').value;
-  const notes   = document.getElementById('er-notes').value.trim();
   if (!client || !loc || !jobType) { toast('warning','Required','Fill in client name, location and job type.'); return; }
   try {
-    // FIX: 'notes' is not a real column on reports — admin notes are stored in custom_fields.admin_notes
+    // Preserve existing custom_fields and merge admin_notes into them
     let cf = {};
     try { cf = JSON.parse(document.getElementById('er-cf').value || '{}') || {}; } catch { cf = {}; }
+    const notes = document.getElementById('er-notes').value.trim();
     if (notes) cf.admin_notes = notes; else delete cf.admin_notes;
-    // CRITICAL: technician_id, created_by, assigned_by, assigned_at are intentionally absent
+
+    // datetime-local values come back as "YYYY-MM-DDTHH:mm" — convert to ISO or null
+    const toISO = v => v ? new Date(v).toISOString() : null;
+
+    // PATCH all editable fields. technician_id, created_at, organisation_id intentionally omitted.
     await api(`/rest/v1/reports?id=eq.${id}`, {
       method: 'PATCH', prefer: 'return=minimal',
-      body: JSON.stringify({ client_name: client, client_location: loc, job_type: jobType, status, priority: prio, custom_fields: cf, updated_at: new Date().toISOString() }),
+      body: JSON.stringify({
+        // Job info
+        job_title:          document.getElementById('er-jtitle').value.trim() || null,
+        job_number:         document.getElementById('er-jnum').value.trim() || null,
+        job_type:           jobType,
+        status:             document.getElementById('er-status').value,
+        priority:           document.getElementById('er-prio').value,
+        job_started_at:     toISO(document.getElementById('er-started').value),
+        job_ended_at:       toISO(document.getElementById('er-ended').value),
+        // Client
+        client_name:        client,
+        client_location:    loc,
+        client_contact:     document.getElementById('er-contact').value.trim() || null,
+        client_name_signed: document.getElementById('er-signed').value.trim() || null,
+        // Report content
+        issue_description:  document.getElementById('er-issue').value.trim() || null,
+        actions_taken:      document.getElementById('er-actions').value.trim() || null,
+        findings:           document.getElementById('er-findings').value.trim() || null,
+        recommendations:    document.getElementById('er-recs').value.trim() || null,
+        // Admin notes in custom_fields
+        custom_fields:      cf,
+        updated_at:         new Date().toISOString(),
+      }),
     });
     closeModal('m-edit-report');
-    toast('success','Report Updated','Changes saved. Original technician & creator preserved.');
+    toast('success','Report Updated','Changes saved. Original technician & submission date preserved.');
     loadReports();
   } catch(e) { toast('error','Save Failed', e.message); }
 }
